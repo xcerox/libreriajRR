@@ -1,14 +1,14 @@
 package com.libreria.sistem;
 
-import com.library.util.Empty;
+import com.libreriajRR.util.Empty;
 import java.io.File;
 import java.util.ArrayList;
 
 public class Directorio {
 
     {
-        ext = Empty.emptyString;
-        buscarEnSubCarpetas = Empty.emptyBoolean;
+        ext = Empty.EMPTY_STRING;
+        buscarEnSubCarpetas = Empty.EMTPY_BOOLEAN;
     }
 
     private String ext;
