@@ -4,9 +4,6 @@ import com.libreriajRR.util.Empty;
 
 public class CoreValidacion {
     
-    static{
-    }
-    
     public static boolean isLetter(char value){
         return  Character.isLetter(value);
     }
@@ -23,10 +20,32 @@ public class CoreValidacion {
         return  Character.isLowerCase(value);
     }
     
-    public static boolean isSimbol(char value){
-        return  (Character.getType(value) == Character.OTHER_SYMBOL) 
-                || (Character.getType(value) == Character.CURRENCY_SYMBOL) 
-                || (Character.getType(value) == Character.MATH_SYMBOL);
+    public static boolean isSymbol(int ascii){
+        final int rangoTeclas = 32;
+        final int minNumero = 48;
+        final int maxNumero = 57;
+        final int minUpper = 65;
+        final int maxUpper = 90;
+        final int minLower = 97;
+        final int maxLower = 122;
+        boolean isSymbol = Empty.EMTPY_BOOLEAN;
+
+        if(ascii > rangoTeclas){
+            if ((ascii < minNumero) & (ascii > maxNumero)){
+                isSymbol = true;
+            }else if ((ascii < minUpper) & (ascii > maxUpper)){
+                isSymbol = true;
+            }else if ((ascii < minLower) & (ascii > maxLower)){
+                isSymbol = true;
+            }
+        }
+        
+        return  isSymbol;
+    }
+    
+    public static boolean isSymbol(char value){
+        int valorAscii = (int)value;
+        return isSymbol(valorAscii);
     }
     
     public static boolean isExistInCadena(char value, String cadena){
