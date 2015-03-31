@@ -25,24 +25,20 @@ public class GnuPG
 		
 		try
 		{
-			p = Runtime.getRuntime().exec("gpg --armor --batch --encrypt -r " +
-rcpt);
+			p = Runtime.getRuntime().exec("gpg --armor --batch --encrypt -r " + rcpt);
 		}
 		catch(IOException io)
 		{
 			System.out.println("Error creating process.");
 		}
 
-		ProcessStreamReader psr_stdout = new ProcessStreamReader("STDIN",
-p.getInputStream());
-		ProcessStreamReader psr_stderr = new ProcessStreamReader("STDERR",
-p.getErrorStream());
+		ProcessStreamReader psr_stdout = new ProcessStreamReader("STDIN", p.getInputStream());
+		ProcessStreamReader psr_stderr = new ProcessStreamReader("STDERR", p.getErrorStream());
 
 		psr_stdout.start();
 		psr_stderr.start();
 		
-		BufferedWriter out = new BufferedWriter(new
-OutputStreamWriter(p.getOutputStream()));
+		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		
 		try
 		{
@@ -89,25 +85,20 @@ OutputStreamWriter(p.getOutputStream()));
 		
 		try
 		{
-			p = Runtime.getRuntime().exec("gpg --passphrase-fd 0 --batch
---decrypt "
-							+ f.getAbsolutePath());
+			p = Runtime.getRuntime().exec("gpg --passphrase-fd 0 --batch--decrypt "+ f.getAbsolutePath());
 		}
 		catch(IOException io)
 		{
 			System.out.println("Error creating process.");
 		}
 
-		ProcessStreamReader psr_stdout = new ProcessStreamReader("STDIN",
-p.getInputStream());
-		ProcessStreamReader psr_stderr = new ProcessStreamReader("STDERR",
-p.getErrorStream());
+		ProcessStreamReader psr_stdout = new ProcessStreamReader("STDIN",p.getInputStream());
+		ProcessStreamReader psr_stderr = new ProcessStreamReader("STDERR",p.getErrorStream());
 
 		psr_stdout.start();
 		psr_stderr.start();
 		
-		BufferedWriter out = new BufferedWriter(new
-OutputStreamWriter(p.getOutputStream()));
+		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		
 		try
 		{	
@@ -166,6 +157,7 @@ extends Thread
 		this.stream = new StringBuffer();
 	}
 
+        @Override
 	public void run()
 	{
 		try
