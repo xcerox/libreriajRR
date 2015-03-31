@@ -28,19 +28,19 @@ public class CoreValidacion {
         final int maxUpper = 90;
         final int minLower = 97;
         final int maxLower = 122;
-        boolean isSymbol = Empty.EMTPY_BOOLEAN;
+        boolean indicadorSimbolo = Empty.EMTPY_BOOLEAN;
 
         if(ascii > rangoTeclas){
             if ((ascii < minNumero) & (ascii > maxNumero)){
-                isSymbol = true;
+                indicadorSimbolo = true;
             }else if ((ascii < minUpper) & (ascii > maxUpper)){
-                isSymbol = true;
+                indicadorSimbolo = true;
             }else if ((ascii < minLower) & (ascii > maxLower)){
-                isSymbol = true;
+                indicadorSimbolo = true;
             }
         }
         
-        return  isSymbol;
+        return  indicadorSimbolo;
     }
     
     public static boolean isSymbol(char value){
