@@ -11,10 +11,13 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.MessageDigest;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import com.libreriajRR.util.Empty;
 
 public class Md5 {
-
+    //nota el vectorInicial debe contener 16 caracteres
+    
     public Md5() {
+       
     }
 
     private static String md5(final String input) throws NoSuchAlgorithmException{
@@ -33,10 +36,13 @@ public class Md5 {
     }
     
     public String encrypt(final String dataToEncrypt, final String initialVector, final  String secretKey){
-        String encryptedData = null;
+        String encryptedData = Empty.EMPTY_STRING;
         try {
+            //se inicializa el cifrado
             final Cipher cipher = initCipher(Cipher.ENCRYPT_MODE, initialVector, secretKey);
+            //se encripta la informacion
             final byte[] encryptedByteArray = cipher.doFinal(dataToEncrypt.getBytes());
+            //se codifica usuando base64
             encryptedData = (new BASE64Encoder()).encode(encryptedByteArray);
         } catch (Exception e) {
             System.err.println("Problema encriptando la data");
@@ -46,10 +52,13 @@ public class Md5 {
     }
     
     public String decrypt(final String encryptedData, final String initialVector, final String secrectKey){
-        String decriptedData = null;
+        String decriptedData = Empty.EMPTY_STRING;
         try {
+            //se inicializa el cifrado
             final Cipher cipher = initCipher(Cipher.DECRYPT_MODE, initialVector, secrectKey);
+            //se decodifica usando base64
             final byte[] encryptedByteArray = (new BASE64Decoder()).decodeBuffer(encryptedData);
+            //se desencripta la informacion
             final byte[] decriptedByteArray = cipher.doFinal(encryptedByteArray);
             decriptedData = new String(decriptedByteArray, "UTF8");
         } catch (Exception e) {
