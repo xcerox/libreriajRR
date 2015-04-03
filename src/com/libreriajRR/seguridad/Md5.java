@@ -1,19 +1,20 @@
 
 package com.libreriajRR.seguridad;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.MessageDigestAlgorithms;
+import java.util.Base64;
 import java.security.MessageDigest;
 import com.libreriajRR.util.Empty;
 
-//clase de cifrado MD5 simple para cifrar informacion pero no Decifrarlo
+//clase de cifrado MD5 simple para cifrar informacion pero no Descifr
 
 public class Md5 {
     
     {
         textoCifrado = Empty.EMPTY_STRING;
+        mensajeError = Empty.EMPTY_STRING;
     }
     
     private String textoCifrado;
+    private String mensajeError;
     
     public Md5() {
        
@@ -21,34 +22,40 @@ public class Md5 {
     
     private byte[] cifrar(final String texto) throws Exception{
         
-    final MessageDigest cifrador = MessageDigest.getInstance(MessageDigestAlgorithms.MD5);
+    MessageDigest cifrador = MessageDigest.getInstance("MD5");
     cifrador.update(texto.getBytes());
     
     final byte[] textoPreCifrado = cifrador.digest();
-    final byte[] textoCifradoCompleto = Base64.encodeBase64(textoPreCifrado);
+    final byte[] textoCifradoCompleto = Base64.getEncoder().encode(textoPreCifrado);
         
     return textoCifradoCompleto;
     }
 
-    public boolean DoCifrarTexto(final String texto) throws Exception{
+    public boolean DoCifrarTexto(final String texto){
         boolean continuar = Empty.EMTPY_BOOLEAN;
         
-        if(texto.isEmpty())
-            this.textoCifrado = Empty.EMPTY_STRING;
-        else{
-            this.textoCifrado = new String(cifrar(texto));
-            continuar = true;
+        try{
+            if(texto.isEmpty()){
+                this.textoCifrado = Empty.EMPTY_STRING;
+                this.mensajeError = "El texto esta en blanco";
+            }else{
+                this.textoCifrado = new String(cifrar(texto));
+                continuar = true;
+            }
+            
+        }catch(Exception error){
+            mensajeError = error.getMessage();
         }
-   
+        
         return continuar;
     }
-    
-    public String GetResultado(){
+        
+    public String getResultado(){
         return this.textoCifrado;
+    }
+
+    public String getMensajeError() {
+        return this.mensajeError;
     }
     
 }
-
-
-
-
