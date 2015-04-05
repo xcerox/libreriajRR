@@ -1,5 +1,5 @@
-
-package com.libreriajRR.seguridad;
+    
+package com.libreriajRR.seguridad.Encriptacion;
 import java.util.Base64;
 import java.security.MessageDigest;
 import com.libreriajRR.util.Empty;
