@@ -8,7 +8,7 @@ public class Directorio {
 
     {
         ext = Empty.EMPTY_STRING;
-        buscarEnSubCarpetas = Empty.EMTPY_BOOLEAN;
+        buscarEnSubCarpetas = Empty.EMPTY_BOOLEAN;
     }
 
     private String ext;

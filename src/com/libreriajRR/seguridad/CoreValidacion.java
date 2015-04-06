@@ -28,7 +28,7 @@ public class CoreValidacion {
         final int maxUpper = 90;
         final int minLower = 97;
         final int maxLower = 122;
-        boolean indicadorSimbolo = Empty.EMTPY_BOOLEAN;
+        boolean indicadorSimbolo = Empty.EMPTY_BOOLEAN;
 
         if(ascii > rangoTeclas){
             if ((ascii < minNumero) & (ascii > maxNumero)){
@@ -49,7 +49,7 @@ public class CoreValidacion {
     }
     
     public static boolean isExistInCadena(char value, String cadena){
-        boolean continuar = Empty.EMTPY_BOOLEAN;
+        boolean continuar = Empty.EMPTY_BOOLEAN;
         
         for (int ixChar = 0;  ixChar < cadena.length() ; ixChar++) {
             if (value == cadena.charAt(ixChar)){
