@@ -32,7 +32,7 @@ public class Md5 {
     }
 
     public boolean DoCifrarTexto(final String texto){
-        boolean continuar = Empty.EMTPY_BOOLEAN;
+        boolean continuar = Empty.EMPTY_BOOLEAN;
         
         try{
             if(texto.isEmpty()){
