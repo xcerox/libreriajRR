@@ -4,7 +4,7 @@ import java.util.Base64;
 import java.security.MessageDigest;
 import com.libreriajRR.util.Empty;
 
-//clase de cifrado MD5 simple para cifrar informacion pero no Descifr
+//clase de cifrado MD5 simple para cifrar informacion pero no Descifrar
 
 public class Md5 {
     

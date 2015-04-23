@@ -18,21 +18,27 @@ import com.libreriajRR.util.Empty;
 
 public class Rsa {
     
+    {
+        instanciaEncriptacion = "RSA/ECB/PKCS1Padding";
+        instanciaLlaves = "RSA";
+        mensajeError = Empty.EMPTY_STRING;
+        textoReEncriptado = Empty.EMPTY_STRING;
+    }
+    
     private PublicKey llavePublica;
     private PrivateKey llavePrivada;
-    final String instanciaEncriptacion = "RSA/ECB/PKCS1Padding";
-    final String instanciaLlaves = "RSA";
+    private final String instanciaEncriptacion;
+    private final String instanciaLlaves;
     private EntidadRsa entidadResultado;
     private String mensajeError;
-    
+    private String textoReEncriptado;
     
     private boolean generarLLaves() throws Exception{
         KeyPairGenerator generadorParLlaves = KeyPairGenerator.getInstance(instanciaLlaves);
         KeyPair llaves = generadorParLlaves.generateKeyPair();
         llavePublica = llaves.getPublic();
         llavePrivada = llaves.getPrivate();
-        boolean continuar = ((llavePrivada.toString() != Empty.EMPTY_STRING) && (llavePublica.toString() != Empty.EMPTY_STRING));
-        return  continuar;
+        return  ((llavePrivada.toString() != Empty.EMPTY_STRING) && (llavePublica.toString() != Empty.EMPTY_STRING));
     }
     
     private PublicKey loadllavePublica(final String llavePublica) throws Exception{
@@ -88,6 +94,7 @@ public class Rsa {
             _llavePrivada = Empty.EMPTY_STRING;
             _llavePublica = Empty.EMPTY_STRING;
             continuar = Empty.EMPTY_BOOLEAN;
+            mensajeError = "El texto no puede estar en blanco";
             
         }else{
             contendoCifrado = new String(encriptarTexto(texto));
@@ -103,9 +110,28 @@ public class Rsa {
         return continuar;
     }
     
-    public boolean reEncriptarTexto(final String texto, final String _llavePublica){
-        
-        llavePrivada = loadllavePublica(_llavePublica);
-        
+    public boolean reEncriptarTexto(final String texto, final String llavePublicaTexto){
+        boolean continuar = Empty.EMPTY_BOOLEAN;
+        if (!texto.isEmpty() && !llavePublicaTexto.isEmpty()){
+            try{
+                this.llavePublica = loadllavePublica(llavePublicaTexto);
+                final byte[] textoPreEncriptado = encriptador(Cipher.ENCRYPT_MODE, this.llavePublica, texto);
+                final byte[] textoEncriptado = Base64.getEncoder().encode(textoPreEncriptado);
+                textoReEncriptado = new String(textoEncriptado);
+                continuar = true;
+            }catch(Exception error){
+                error.printStackTrace();
+                mensajeError = "No se a podido encriptar el texto";
+            }finally{
+                return continuar;
+            }
+        }else
+            return continuar;
+    }  
+    
+    public String getResultadoReEncriptado(){
+        return textoReEncriptado;
     }
+    
 }
+
