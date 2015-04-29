@@ -13,9 +13,7 @@ import javax.crypto.Cipher;
 
 import java.util.Base64;
 import com.libreriajRR.util.Empty;
-import java.util.Arrays;
-import java.util.ArrayList;
-
+import java.security.SecureRandom;
 
 public class Rsa {
     
@@ -78,7 +76,7 @@ public class Rsa {
         {
             this.instanciaLlaves = "RSA";
             this.mensajeError = Empty.EMPTY_STRING;
-        }
+        }   
 
         public Llaves() {
         }
@@ -94,9 +92,11 @@ public class Rsa {
             
             try{
                 KeyPairGenerator generadorParLlaves = KeyPairGenerator.getInstance(instanciaLlaves);
+                generadorParLlaves.initialize(1024, new SecureRandom());
+                
                 KeyPair llaves = generadorParLlaves.generateKeyPair();
-                this.llavePublica = llaves.getPublic();
-                this.llavePrivada = llaves.getPrivate();
+                this.llavePublica = loadllavePublica(base64ToString(llaves.getPublic()));
+                this.llavePrivada = loadllavePrivada(base64ToString(llaves.getPrivate()));
                 continuar = true;
             }catch(Exception error){
                 this.mensajeError = error.getMessage();
@@ -107,52 +107,34 @@ public class Rsa {
         }
         
         public KeyPair getResultado(){
-            return  new KeyPair(llavePublica, llavePrivada);
+            return new KeyPair(this.llavePublica, this.llavePrivada);
         }
         
         public String getMensajeError() {
-            return mensajeError;
+            return this.mensajeError;
         }
         
-        public PublicKey loadllavePublica(final String llavePublica){
-            PublicKey llavePublicaCargada = null;
-            
-            try {
-                final byte[] byteEncriptado = llavePublica.getBytes();
-                final byte[] byteLlave = Base64.getDecoder().decode(byteEncriptado);
-                
-                KeyFactory  creadorLlaves = KeyFactory.getInstance(this.instanciaLlaves);
-                KeySpec llave = new X509EncodedKeySpec(byteEncriptado);
-                llavePublicaCargada = creadorLlaves.generatePublic(llave);
-            }catch(Exception error){
-                this.mensajeError = error.getMessage();
-                error.printStackTrace();
-            }
-            
-            return llavePublicaCargada;
+        public PublicKey loadllavePublica(final String llavePublica) throws Exception{
+            final byte[] byteFronString = Base64.getDecoder().decode(llavePublica);
+
+            X509EncodedKeySpec codificador = new X509EncodedKeySpec(byteFronString);
+            KeyFactory creadorLlaves = KeyFactory.getInstance(this.instanciaLlaves);
+            PublicKey llaveGenerada = creadorLlaves.generatePublic(codificador);
+            return llaveGenerada;
         }
 
-        public PrivateKey loadllavePrivada(final String llavePrivada){
-            PrivateKey llavePrivateCargada = null;
-            this.mensajeError = Empty.EMPTY_STRING;
+        public PrivateKey loadllavePrivada(final String llavePrivada) throws Exception{
+            final byte[] byteFronString = Base64.getDecoder().decode(llavePrivada);
             
-            try {
-                final byte[] byteEncriptado = llavePrivada.getBytes();
-                final byte[] byteLlave = Base64.getDecoder().decode(byteEncriptado);
-                
-                KeyFactory  creadorLlaves = KeyFactory.getInstance(this.instanciaLlaves);
-                KeySpec llave = new PKCS8EncodedKeySpec(byteLlave);
-                llavePrivateCargada = creadorLlaves.generatePrivate(llave);
-            }catch(Exception error){
-                this.mensajeError = error.getMessage();
-                error.printStackTrace();
-            }
-            
-            return llavePrivateCargada;
+            PKCS8EncodedKeySpec codificador = new PKCS8EncodedKeySpec(byteFronString);
+            KeyFactory creadorLlaves = KeyFactory.getInstance(this.instanciaLlaves);
+            PrivateKey llaveGenerada = creadorLlaves.generatePrivate(codificador);
+            return llaveGenerada;
         }
         
-        public String KeyToString(Key key) throws Exception{
-            return Base64.getEncoder().encodeToString(key.getEncoded()); 
+        public String base64ToString (Key key) throws Exception{
+            final byte[] byteFromKey = key.getEncoded();
+            return Base64.getEncoder().encodeToString(byteFromKey); 
         }
     }
     
@@ -162,18 +144,23 @@ public class Rsa {
     private Llaves llaves;
     private String mensajeError;
     private String textoResultado;
-        
+    
     //region cifrado
-    private byte[] cifrador(final int modo, final Key llave, final String contenido) throws Exception{
+    private byte[] cifrador(final int modo, final Key llave, final byte[] contenido) throws Exception{
         Cipher EncriptadorRSA = Cipher.getInstance(instanciaEncriptacion);
-        EncriptadorRSA.init(modo, llave);
-        return  EncriptadorRSA.doFinal(contenido.getBytes());
+        
+        if(llave instanceof PrivateKey)
+            EncriptadorRSA.init(modo, llave);
+        else if(llave instanceof PublicKey)
+            EncriptadorRSA.init(modo, llave, new SecureRandom());
+        
+        return  EncriptadorRSA.doFinal(contenido);
     }
     
     private byte[] cifrar(final String texto, PublicKey llavePublica){
         byte[] textoEncriptado = null;
         try{
-              final byte[] textoPreEncriptado = cifrador(Cipher.ENCRYPT_MODE, llavePublica, texto);
+              final byte[] textoPreEncriptado = cifrador(Cipher.ENCRYPT_MODE, llavePublica, texto.getBytes());
               textoEncriptado = Base64.getEncoder().encode(textoPreEncriptado);
         }catch(Exception error){
             mensajeError += error.getMessage();
@@ -187,7 +174,7 @@ public class Rsa {
         
         try {
             final byte[] textoPreDescrifrado = Base64.getDecoder().decode(textoCifrado);
-            textoDescifrado = cifrador(Cipher.DECRYPT_MODE, llavePrivada, new String(textoPreDescrifrado));
+            textoDescifrado = cifrador(Cipher.DECRYPT_MODE, llavePrivada, textoPreDescrifrado);
         } catch (Exception error){
             this.mensajeError += error.getMessage();
             error.printStackTrace();
@@ -195,7 +182,6 @@ public class Rsa {
         
         return textoDescifrado;
     }
-    
     //end region cifrado
     
     //region encriptado
@@ -207,8 +193,8 @@ public class Rsa {
         try{
             if(!texto.isEmpty()){
                 if(llaves.generarLLaves()){
-                    String llavePrivada = llaves.KeyToString(llaves.getResultado().getPrivate());
-                    String llavePublica = llaves.KeyToString(llaves.getResultado().getPublic());
+                    String llavePrivada = llaves.base64ToString(llaves.getResultado().getPrivate());
+                    String llavePublica = llaves.base64ToString(llaves.getResultado().getPublic());
                     entidadResultado = new EntidadRsa(llavePublica,llavePrivada,new String(cifrar(texto,llaves.getResultado().getPublic())));
                     continuar = true;
                 }
@@ -222,25 +208,7 @@ public class Rsa {
         }finally{
             return continuar;
         }
-    }
-    
-    public boolean encriptarConLlave(final String texto, final String LlavePublica){
-        boolean continuar = Empty.EMPTY_BOOLEAN;
-        this.mensajeError = Empty.EMPTY_STRING;
-        if (!texto.isEmpty() && !LlavePublica.isEmpty()){
-            try{
-                PublicKey llavePublicaCargada = llaves.loadllavePublica(LlavePublica);
-                this.textoResultado = new String(cifrar(texto,llavePublicaCargada));
-                continuar = true;
-            }catch(Exception error){
-                error.printStackTrace();
-                mensajeError += error.getMessage();
-            }
-        }else
-            mensajeError += " El texto o la llave publica estan en blanco";
-        
-        return continuar;
-    }  
+    } 
     
     public boolean desencriptar(final String textoEncriptado, final String llavePrivada){
         boolean continuar = Empty.EMPTY_BOOLEAN;
