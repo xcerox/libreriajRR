@@ -95,8 +95,15 @@ public class Rsa {
                 generadorParLlaves.initialize(1024, new SecureRandom());
                 
                 KeyPair llaves = generadorParLlaves.generateKeyPair();
-                this.llavePublica = loadllavePublica(base64ToString(llaves.getPublic()));
-                this.llavePrivada = loadllavePrivada(base64ToString(llaves.getPrivate()));
+                
+                //llaves originales
+                PublicKey llavePublicaOriginal = llaves.getPublic();
+                PrivateKey llavePrivateOriginal = llaves.getPrivate();
+                
+                
+                //llaves procesadas
+                this.llavePublica = loadllavePublica(base64ToString(llavePublicaOriginal));
+                this.llavePrivada = loadllavePrivada(base64ToString(llavePrivateOriginal));
                 continuar = true;
             }catch(Exception error){
                 this.mensajeError = error.getMessage();
